@@ -39,7 +39,7 @@ export default async function handler (req, res) {
 
             // sort ({createdAt:-1}) ordena de mas reciente a mas antiguo
             // Se devuelve tanto el total de documentos encontrados
-            const tickets = (await Ticket.find(filtro)).toSorted({createdAt: -1});
+            const tickets = await Ticket.find(filtro).toSorted({createdAt: -1});
             return res.status(200).json({total: tickets.length, datos: tickets})
         }
 
