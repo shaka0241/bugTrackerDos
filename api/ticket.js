@@ -17,31 +17,34 @@ export default async function handler (req, res) {
         // req.query contiene los parametros que le podemos pasar por url
         // por ejemplo /api/tickets?estado=abierto.  
         // El filtro empieza vacio, asi que no llega si no llega ninguin parametro, Ticket.find devuelve todos los tickets
-        if(method === "GET") {
-            const {prioridad, estado, buscar, sinAsignar} = req.query;
-            const filtro = {};
+        if (method === "GET") {
+      // req.query contiene los parámetros de la URL, por ejemplo:
+      // /api/tickets?estado=abierto. El filtro empieza vacío, así que si no
+      // llega ningún parámetro, Ticket.find({}) devuelve todos los tickets.
+      const { prioridad, estado, buscar, sinAsignar } = req.query;
+      const filtro = {};
 
+      // Solo se añade cada condición si su parámetro está presente.
+      // Estas asignaciones son ejemplos de if de una sola instrucción:
+      // la instrucción inmediatamente posterior al if es la única condicionada.
+      if (prioridad) filtro.prioridad = prioridad;
+      if (estado) filtro.estado = estado;
+      if (buscar) {
+        // $regex busca el texto dentro del título y la opción "i" ignora
+        // diferencias entre mayúsculas y minúsculas.
+        filtro.titulo = { $regex: buscar, $options: "i" };
+      }
+      if (sinAsignar === "true") {
+        // Los parámetros de query llegan como texto. Se compara con "true"
+        // y $exists: false selecciona documentos sin ese campo guardado.
+        filtro.agenteAsignado = { $exists: false };
+      }
 
-            // Solo se añade cada condicion si su parametro esta presente 
-            // Son ejemplos de if de una sola instrucion
-            if(prioridad) filtro.prioridad = prioridad;
-            if(estado) filtro.estado = estado;
-            if(buscar) {
-                // regex busca el texto en este caso dentro de titulo y la opcion "i" ignora diferencias entre mayusculas y minusculas
-                filtro.titulo = { $regex: buscar, $options: "i"}
-            }
-
-            if(sinAsignar === "true"){
-                // Los parametros de query que llegan, lo hacen como texto. Se compara con "true"
-                // $exisits false selecciona documentos sin este campo guardado
-                filtro.agenteAsignado = { $exists: false}
-            }
-
-            // sort ({createdAt:-1}) ordena de mas reciente a mas antiguo
-            // Se devuelve tanto el total de documentos encontrados
-            const tickets = await Ticket.find(filtro).toSorted({createdAt: -1});
-            return res.status(200).json({total: tickets.length, datos: tickets})
-        }
+      // sort({ createdAt: -1 }) ordena de más reciente a más antiguo.
+      // Se devuelve tanto el total encontrado como los documentos.
+      const tickets = await Ticket.find(filtro).sort({ createdAt: -1 });
+      return res.status(200).json({ total: tickets.length, datos: tickets });
+    }
 
         // Si method no conincide con Get, la ruta no admite esa operacion. 405 significa method not allowed
         return res.status(405).json({error: `Metodo ${method} no permitido`})
