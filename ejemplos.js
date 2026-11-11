@@ -48,8 +48,8 @@
 //     );
 //     console.log("Total de tickets encontrados:", ticketsSinHoras.length);
 
-const ticketsTitulo = await Ticket.find({
-  titulo: { $regex: "el", $options: "i" },
-}).select("codigo titulo -_id");
+// const ticketsTitulo = await Ticket.find({
+//   titulo: { $regex: "el", $options: "i" },
+// }).select("codigo titulo -_id");
 
-console.log("\n Tickets cuyo título contiene 'el' ($regex):", ticketsTitulo);
+// console.log("\n Tickets cuyo título contiene 'el' ($regex):", ticketsTitulo);
